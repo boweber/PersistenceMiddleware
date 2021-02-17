@@ -6,7 +6,7 @@
 
 - Just like in every *Core Data* related project, you need a `NSManagedObjectModel`, containing details about every entity. 
     For example, a model with the name "MusicDB" has two entities *Song* and *Album* with an associated `NSManagedObject` for each of them. The *Song* entity 
-    has for this example just one attribute *title*:
+    has for simplicity reasons just one attribute *title*:
     ```swift 
     @objc(ManagedSong)
     class ManagedSong: NSMangedObject {
@@ -18,6 +18,8 @@
     ```swift
     struct Song: CoreDataPersistable {
         var title: String?
+
+        // Required by CoreDataPersistable
         let managedObjectID: NSManagedObjectID?
 
         init(title: String?) {
@@ -25,11 +27,13 @@
             self.managedObjectID = nil
         }
 
+        // Required by CoreDataPersistable
         init(_ persistableObject: ManagedSong) throws {
             self.title = persistableObject.title
             self.managedObjectID = persistableObject.objectID
         }
 
+        // Required by CoreDataPersistable
         func update(_ managedObject: ManagedSong) throws -> ManagedSong {
             if managedObject.title != title {
                 managedObject.title = title
@@ -37,6 +41,7 @@
             return managedObject
         }
 
+        // Required by CoreDataPersistable
         static var managedObjectEntityName: String = "Song"
     }
     ```
@@ -46,8 +51,10 @@
         case all
         case allWithTitle(String)
 
+        // Required by CoreDataRequest
         typealias Element = Song
         
+        // Required by CoreDataRequest
         var fetchRequest: NSFetchRequest<ManagedSong> {
             let request: NSFetchRequest<ManagedSong> = ManagedSong.fetchRequest()
             switch self {
@@ -59,6 +66,7 @@
             return request
         }
         
+        // Required by CoreDataRequest
         var sortDescriptors: [NSSortDescriptor] {
             [
                 NSSortDescriptor(keyPath: \ManagedSong.title, ascending: true)

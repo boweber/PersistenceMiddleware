@@ -8,7 +8,7 @@
 import XCTest
 import Foundation
 import PersistenceMiddleware
-import CoreDataMiddleware
+@testable import CoreDataMiddleware
 import CoreData
 import SwiftRex
 import CombineRex
@@ -27,12 +27,13 @@ class SwiftRexIntegrationTests: XCTestCase {
     }
 
     func makeStore(
+        customContainer: CoreDataContainer? = nil,
         savePublisher: ((NSPersistentContainer, SongTitleRequest.Element) -> AnyPublisher<Void, CoreDataError>)? = nil,
         deletePublisher: ((NSPersistentContainer, SongTitleRequest.Element) -> AnyPublisher<Void, CoreDataError>)? = nil,
         requestPublisher: ((NSPersistentContainer, SongTitleRequest) -> AnyPublisher<PersistenceFetchResult<SongTitleRequest.Element>, CoreDataError>)? = nil
     ) throws -> ReduxStoreBase<AppAction, AppState> {
         let testContainer = try XCTUnwrap(NSPersistentContainer.testContainer)
-        let container = CoreDataContainer(testContainer)
+        let container = customContainer ?? CoreDataContainer(testContainer)
         let middleware: AnyMiddleware<AppAction, AppAction, AppState> = (
             CoreDataController<SongArtistRequest>(container)
                 .makeMiddleware()
@@ -101,5 +102,37 @@ class SwiftRexIntegrationTests: XCTestCase {
         
         store.dispatch(.title(.request(.all)))
         wait(for: [expectInitialState, expectLoadingState, expectElements], timeout: 1, enforceOrder: true)
+    }
+    
+    func testFailLoadingStoresWhileRequestingElements() throws {
+        let testContainer = try XCTUnwrap(NSPersistentContainer.testContainer)
+        let container = CoreDataContainer(
+            state: .initial(
+                container: testContainer,
+                publisher: { _ in Fail.testFailure(outputType: NSPersistentContainer.self) }
+            )
+        )
+        let store = try makeStore(customContainer:  container)
+        
+        let expectInitialState = expectation(description: "Initial")
+        let expectLoadingState = expectation(description: "loading")
+        let expectLoadingFailure = expectation(description: "Failed")
+        
+        store.statePublisher.sink { state in
+            switch state.title.request {
+            case .initial:
+                expectInitialState.fulfill()
+            case .loading:
+                expectLoadingState.fulfill()
+            case .failed(error: let error, request: _):
+                if case .containerError(_) = error {
+                    expectLoadingFailure.fulfill()
+                }
+            default: XCTFail()
+            }
+        }.store(in: &cancellables)
+        
+        store.dispatch(.title(.request(.all)))
+        wait(for: [expectInitialState, expectLoadingState, expectLoadingFailure], timeout: 1, enforceOrder: true)
     }
 }

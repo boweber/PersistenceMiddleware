@@ -51,7 +51,7 @@ The middleware is only accessible through an object, which conforms to the `Pers
 
         func savePublisher(for element: Element) -> AnyPublisher<Void, PersistenceError>
         func deletePublisher(for element: Element) -> AnyPublisher<Void, PersistenceError>
-        func requestPublisher(for request: Request) -> AnyPublisher<PersistenceFetchResult<Element>,    PersistenceError>
+        func requestPublisher(for request: Request) -> AnyPublisher<PersistenceFetchResult<Element>, PersistenceError>
     }
 
     public extension PersistenceController {
