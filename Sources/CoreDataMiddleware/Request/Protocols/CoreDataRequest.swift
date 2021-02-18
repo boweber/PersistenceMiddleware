@@ -6,12 +6,11 @@
 //
 
 import CoreData
-import PersistenceMiddleware
 
 public protocol CoreDataRequest {
-    associatedtype Element: CoreDataPersistable
+    associatedtype ManagedObject: NSManagedObject
     
-    var fetchRequest: NSFetchRequest<Element.PersistableObject> { get }
+    var fetchRequest: NSFetchRequest<ManagedObject> { get }
     var sortDescriptors: [NSSortDescriptor] { get }
     var sectionNameKeyPath: String? { get }
     var cacheName: String? { get }

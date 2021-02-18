@@ -43,7 +43,7 @@ class ControllerTests: XCTestCase {
         let expectSave = expectation(description: "Did save element")
         XCTAssertNil(try entity(with: attribute))
         
-        CoreDataController<SongArtistRequest>(container)
+        CoreDataController<SongArtist>(container)
             .savePublisher(for: SongArtist(artistName: attribute))
             .sink { completion in
                 switch completion {
@@ -72,7 +72,7 @@ class ControllerTests: XCTestCase {
         savedEntity.artistName = newAttribute
         let expectSave = expectation(description: "Did save element")
         
-        CoreDataController<SongArtistRequest>(container)
+        CoreDataController<SongArtist>(container)
             .savePublisher(for: savedEntity)
             .sink { completion in
                 switch completion {
@@ -100,7 +100,7 @@ class ControllerTests: XCTestCase {
         XCTAssertNotNil(savedEntity.managedObjectID)
         let expectDeletion = expectation(description: "Deleted")
 
-        CoreDataController<SongArtistRequest>(container)
+        CoreDataController<SongArtist>(container)
             .deletePublisher(for: savedEntity)
             .sink { completion in
                 switch completion {

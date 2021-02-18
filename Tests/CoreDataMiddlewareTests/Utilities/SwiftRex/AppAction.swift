@@ -10,7 +10,7 @@ import PersistenceMiddleware
 import CoreDataMiddleware
 
 enum AppAction {
-    case artist(CoreDataController<SongArtistRequest>.Action)
+    case artist(CoreDataController<SongArtist>.Action)
     case title(PersistenceAction<SongTitle, CoreDataError, SongTitleRequest>)
     
     

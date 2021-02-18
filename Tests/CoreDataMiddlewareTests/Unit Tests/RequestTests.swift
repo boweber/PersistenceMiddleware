@@ -9,6 +9,7 @@ import Foundation
 import XCTest
 import CoreData
 import Combine
+import PersistenceMiddleware
 @testable import CoreDataMiddleware
 
 class RequestTests: XCTestCase {
@@ -56,10 +57,11 @@ class RequestTests: XCTestCase {
         let expectFirstResult = expectation(description: "First result")
         let expectSecondResult = expectation(description: "Second result")
         let expectThirdResult = expectation(description: "Third result")
-        
-        sut
+        let requestPublisher: AnyPublisher<PersistenceFetchResult<SongArtist>, CoreDataError> = sut
             .viewContext
             .request(SongArtistRequest.all)
+        
+        requestPublisher
             .sink { completion in
             switch completion {
             case .failure(let error): XCTFail(error.localizedDescription)

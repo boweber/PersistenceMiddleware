@@ -28,22 +28,22 @@ class SwiftRexIntegrationTests: XCTestCase {
 
     func makeStore(
         customContainer: CoreDataContainer? = nil,
-        savePublisher: ((NSPersistentContainer, SongTitleRequest.Element) -> AnyPublisher<Void, CoreDataError>)? = nil,
-        deletePublisher: ((NSPersistentContainer, SongTitleRequest.Element) -> AnyPublisher<Void, CoreDataError>)? = nil,
-        requestPublisher: ((NSPersistentContainer, SongTitleRequest) -> AnyPublisher<PersistenceFetchResult<SongTitleRequest.Element>, CoreDataError>)? = nil
+        savePublisher: ((NSPersistentContainer, SongTitle) -> AnyPublisher<Void, CoreDataError>)? = nil,
+        deletePublisher: ((NSPersistentContainer, SongTitle) -> AnyPublisher<Void, CoreDataError>)? = nil,
+        requestPublisher: ((NSPersistentContainer, SongTitle.Request) -> AnyPublisher<PersistenceFetchResult<SongTitle>, CoreDataError>)? = nil
     ) throws -> ReduxStoreBase<AppAction, AppState> {
         let testContainer = try XCTUnwrap(NSPersistentContainer.testContainer)
         let container = customContainer ?? CoreDataContainer(testContainer)
         let middleware: AnyMiddleware<AppAction, AppAction, AppState> = (
-            CoreDataController<SongArtistRequest>(container)
+            CoreDataController<SongArtist>(container)
                 .makeMiddleware()
                 .lift(
                     inputAction: \.artist,
-                    outputAction: { AppAction.artist($0) },
+                    outputAction: AppAction.artist,
                     state: \.artist
                 )
                 <>
-                CoreDataController<SongTitleRequest>(
+                CoreDataController<SongTitle>(
                     container,
                     savePublisher: savePublisher,
                     deletePublisher: deletePublisher,
@@ -52,18 +52,18 @@ class SwiftRexIntegrationTests: XCTestCase {
                 .makeMiddleware()
                 .lift(
                     inputAction: \.title,
-                    outputAction: { AppAction.title($0) },
+                    outputAction: AppAction.title,
                     state: \.title
                 )
         )
         .eraseToAnyMiddleware()
         
         let appReducer: Reducer<AppAction, AppState> = {
-            CoreDataController<SongArtistRequest>
+            CoreDataController<SongArtist>
                 .makeReducer()
                 .lift(action: \AppAction.artist, state: \AppState.artist)
                 <>
-                CoreDataController<SongTitleRequest>
+                CoreDataController<SongTitle>
                 .makeReducer()
                 .lift(action: \AppAction.title, state: \AppState.title)
         }()

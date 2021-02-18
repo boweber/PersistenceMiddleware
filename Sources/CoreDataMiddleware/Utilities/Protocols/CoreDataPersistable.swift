@@ -8,7 +8,8 @@
 import CoreData
 
 public protocol CoreDataPersistable {
-    associatedtype PersistableObject: NSManagedObject
+    associatedtype PersistableObject
+    associatedtype Request: CoreDataRequest where Request.ManagedObject == PersistableObject
     
     var managedObjectID: NSManagedObjectID? { get }
     init(_ persistableObject: PersistableObject) throws

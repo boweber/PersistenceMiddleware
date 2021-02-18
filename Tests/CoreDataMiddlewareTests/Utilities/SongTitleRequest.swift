@@ -10,13 +10,11 @@ import CoreData
 import CoreDataMiddleware
 
 enum SongTitleRequest: CoreDataRequest {
-    typealias Element = SongTitle
-    
     case all
     case withTitle(String)
     
-    var fetchRequest: NSFetchRequest<SongTitle.PersistableObject> {
-        let request: NSFetchRequest<SongTitle.PersistableObject> = ManagedSong.fetchRequest()
+    var fetchRequest: NSFetchRequest<ManagedSong> {
+        let request: NSFetchRequest<ManagedSong> = ManagedSong.fetchRequest()
         switch self {
         case .withTitle(let title):
             request.predicate = NSPredicate(format: "%K == %@", "title", title)

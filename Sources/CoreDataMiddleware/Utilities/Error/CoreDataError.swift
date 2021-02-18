@@ -18,4 +18,3 @@ public enum CoreDataError: Error {
     case missingContext(NSManagedObject)
     case persistableError(Error)
 }
-

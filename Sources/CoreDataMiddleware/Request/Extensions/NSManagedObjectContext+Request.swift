@@ -10,9 +10,9 @@ import Combine
 import PersistenceMiddleware
 
 extension NSManagedObjectContext {
-    func request<Request>(
-        _ request: Request
-    ) -> AnyPublisher<PersistenceFetchResult<Request.Element>, CoreDataError> where Request: CoreDataRequest {
+    func request<Element>(
+        _ request: Element.Request
+    ) -> AnyPublisher<PersistenceFetchResult<Element>, CoreDataError> where Element: CoreDataPersistable {
         CoreDataPersistablePublisher(
             fetchRequest: request.fetchRequest,
             sortDescriptors: request.sortDescriptors,

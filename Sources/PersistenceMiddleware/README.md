@@ -58,14 +58,14 @@ The middleware is only accessible through an object, which conforms to the `Pers
         public func makeMiddleware() -> AnyMiddleware<Action, Action, State>
     }
     ```
-    The `makeMiddleware()` function in `PersistenceController` should reduce the amount of generics to specify, which would be otherwise required. For Example, the `CoreDataController` (see: *CoreDataMiddleware*) just has one generic type to specify.
+    **Sidenote**: The `makeMiddleware()` function in `PersistenceController` should reduce the amount of generics to specify, which would be otherwise required. For Example, the `CoreDataController` (see: *CoreDataMiddleware*) just has one generic type to specify.
     ```swift
-    let controller = CoreDataController<SongRequest>(NSPersistentContainer(name: "MusicDB"))
+    let controller = CoreDataController<Song>(NSPersistentContainer(name: "MusicDB"))
     let middleware = controller.makeMiddleware()
     ```
     which is much easier to read, compared to
     ```swift
-    let controller = CoreDataController<SongRequest>(NSPersistentContainer(name: "MusicDB"))
+    let controller = CoreDataController<Song>(NSPersistentContainer(name: "MusicDB"))
 
     // Here: makeMiddleware<Request>(_ controller: CoreDataController<Request>) is globally accessible
     let middleware: AnyMiddleware<
@@ -82,14 +82,3 @@ Just like the middleware, the reducer is bound to a `PersistenceController` type
         public static func makeReducer() -> Reducer<Action, State>
     }
     ```
-
-## TODO
-
-- Add actions to cancel the current save/delete process ?!
-- Add action handling *move element from index to index* 
-- Add multiple states for different requests ?!  
-    This could be archived with a dictionary (e.g. `[Request.Token: RequestState]`) instead of just `RequestState` as the request parameter type. 
-- Implement section support
-- Implement cache support (reloading previously fetched elements)
-- Implement error resolving functionality
-- Add documentation.

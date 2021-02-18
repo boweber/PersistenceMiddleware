@@ -10,6 +10,7 @@ import CoreData
 import CoreDataMiddleware
 
 struct SongArtist: CoreDataPersistable, Equatable {
+    typealias Request = SongArtistRequest
     static func == (lhs: SongArtist, rhs: SongArtist) -> Bool {
         lhs.artistName == rhs.artistName
     }
